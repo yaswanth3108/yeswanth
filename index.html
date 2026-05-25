@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Portal</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Segoe UI',sans-serif;
+}
+
+body{
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+
+background:linear-gradient(
+135deg,
+#0f172a,
+#1e1b4b,
+#312e81
+);
+
+overflow:hidden;
+}
+
+body::before{
+content:"";
+position:absolute;
+width:300px;
+height:300px;
+border-radius:50%;
+background:linear-gradient(#7c3aed,#3b82f6);
+top:-100px;
+left:-100px;
+opacity:.5;
+}
+
+body::after{
+content:"";
+position:absolute;
+width:350px;
+height:350px;
+border-radius:50%;
+background:linear-gradient(#ec4899,#8b5cf6);
+bottom:-150px;
+right:-100px;
+opacity:.5;
+}
+
+.container{
+width:1000px;
+height:600px;
+display:flex;
+border-radius:30px;
+overflow:hidden;
+background:rgba(255,255,255,.1);
+backdrop-filter:blur(25px);
+box-shadow:0 15px 50px rgba(0,0,0,.4);
+}
+
+.left{
+flex:1;
+padding:60px;
+display:flex;
+flex-direction:column;
+justify-content:center;
+color:white;
+}
+
+.left h1{
+font-size:45px;
+margin-bottom:20px;
+}
+
+.left p{
+font-size:18px;
+line-height:1.6;
+}
+
+.right{
+width:400px;
+background:white;
+padding:40px;
+}
+
+h2{
+text-align:center;
+margin-bottom:25px;
+color:#312e81;
+}
+
+input{
+width:100%;
+padding:15px;
+margin:10px 0;
+border:none;
+background:#f1f5f9;
+border-radius:12px;
+outline:none;
+}
+
+.submit{
+width:100%;
+padding:15px;
+border:none;
+border-radius:12px;
+margin-top:15px;
+cursor:pointer;
+font-size:16px;
+font-weight:bold;
+color:white;
+background:linear-gradient(
+90deg,
+#7c3aed,
+#3b82f6
+);
+}
+
+.link{
+text-align:center;
+margin-top:15px;
+cursor:pointer;
+color:#6366f1;
+font-weight:bold;
+}
+
+.error{
+font-size:12px;
+color:red;
+margin-bottom:5px;
+}
+
+#loginPage,
+#dashboard{
+display:none;
+}
+
+.card{
+padding:15px;
+background:#f8fafc;
+border-radius:10px;
+margin:10px 0;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="left">
+<h1>Student Portal</h1>
+<p>
+Manage student registration, login and dashboard with a modern interface.
+</p>
+</div>
+
+<div class="right">
+
+<!-- SIGNUP -->
+
+<div id="signupPage">
+
+<h2>Create Account</h2>
+
+<input type="text" id="name" placeholder="Name" required>
+
+<input type="text" id="roll" placeholder="Roll Number" required>
+
+<input type="text" id="course" placeholder="Course" required>
+
+<input type="email" id="email" placeholder="Email" required>
+
+<input type="password" id="password" placeholder="Password" required>
+
+<input type="password" id="confirmPassword" placeholder="Confirm Password" required>
+
+<button class="submit" onclick="signup()">
+Signup
+</button>
+
+<div class="link" onclick="showLogin()">
+Already have account? Login
+</div>
+
+</div>
+
+<!-- LOGIN -->
+
+<div id="loginPage">
+
+<h2>Login</h2>
+
+<input type="email"
+id="loginEmail"
+placeholder="Email"
+required>
+
+<input type="password"
+id="loginPassword"
+placeholder="Password"
+required>
+
+<button class="submit"
+onclick="login()">
+
+Login
+
+</button>
+
+<div class="link"
+onclick="showSignup()">
+
+Don't have account? Signup
+
+</div>
+
+</div>
+
+<!-- DASHBOARD -->
+
+<div id="dashboard">
+
+<h2 id="welcome"></h2>
+
+<div class="card" id="rollDisplay"></div>
+
+<div class="card" id="courseDisplay"></div>
+
+<div class="card" id="emailDisplay"></div>
+
+<button class="submit"
+onclick="logout()">
+
+Logout
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+let students=
+JSON.parse(
+localStorage.getItem("students")
+)||[];
+
+
+function signup(){
+
+let name=
+document.getElementById("name").value;
+
+let roll=
+document.getElementById("roll").value;
+
+let course=
+document.getElementById("course").value;
+
+let email=
+document.getElementById("email").value;
+
+let password=
+document.getElementById("password").value;
+
+let confirmPassword=
+document.getElementById("confirmPassword").value;
+
+
+if(
+!name||
+!roll||
+!course||
+!email||
+!password||
+!confirmPassword
+){
+
+alert("Please fill all fields");
+
+return;
+
+}
+
+if(password.length<6){
+
+alert(
+"Password must contain minimum 6 characters"
+);
+
+return;
+
+}
+
+if(
+password!==confirmPassword
+){
+
+alert(
+"Passwords do not match"
+);
+
+return;
+
+}
+
+let exists=
+students.find(
+x=>x.email===email
+);
+
+if(exists){
+
+alert(
+"Student already registered"
+);
+
+return;
+
+}
+
+let student={
+
+name,
+roll,
+course,
+email,
+password
+
+};
+
+students.push(student);
+
+localStorage.setItem(
+"students",
+JSON.stringify(students)
+);
+
+alert(
+"Signup Successful"
+);
+
+showLogin();
+
+}
+
+
+function login(){
+
+let email=
+document.getElementById("loginEmail").value;
+
+let password=
+document.getElementById("loginPassword").value;
+
+let user=
+students.find(
+
+x=>
+
+x.email===email
+&&
+x.password===password
+
+);
+
+if(!user){
+
+alert(
+"Invalid Email or Password"
+);
+
+return;
+
+}
+
+showDashboard(user);
+
+}
+
+
+function showDashboard(user){
+
+document.getElementById(
+"signupPage"
+).style.display="none";
+
+document.getElementById(
+"loginPage"
+).style.display="none";
+
+document.getElementById(
+"dashboard"
+).style.display="block";
+
+document.getElementById(
+"welcome"
+).innerHTML=
+"Welcome, "+user.name;
+
+document.getElementById(
+"rollDisplay"
+).innerHTML=
+"<b>Roll Number:</b> "+user.roll;
+
+document.getElementById(
+"courseDisplay"
+).innerHTML=
+"<b>Course:</b> "+user.course;
+
+document.getElementById(
+"emailDisplay"
+).innerHTML=
+"<b>Email:</b> "+user.email;
+
+}
+
+function showLogin(){
+
+signupPage.style.display="none";
+dashboard.style.display="none";
+loginPage.style.display="block";
+
+}
+
+function showSignup(){
+
+loginPage.style.display="none";
+dashboard.style.display="none";
+signupPage.style.display="block";
+
+}
+
+function logout(){
+
+showLogin();
+
+}
+
+</script>
+
+</body>
+</html>
